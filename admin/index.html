@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理 - ProgramJudge</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <i class="fas fa-code"></i>
+                <span>ProgramJudge</span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html"><i class="fas fa-home"></i> 首页</a>
+                <a href="../problems.html"><i class="fas fa-list"></i> 题目</a>
+                <a href="../submit.html"><i class="fas fa-play"></i> 评测</a>
+                <a href="index.html" class="active"><i class="fas fa-cog"></i> 后台</a>
+                <span class="user-info">
+                    <i class="fas fa-user-shield"></i> Steven1356China (管理员)
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1><i class="fas fa-tachometer-alt"></i> 管理后台</h1>
+        
+        <div class="admin-panel">
+            <div class="admin-sidebar">
+                <h3><i class="fas fa-bars"></i> 管理菜单</h3>
+                <ul>
+                    <li><a href="index.html" class="active"><i class="fas fa-tachometer-alt"></i> 仪表板</a></li>
+                    <li><a href="edit-problem.html"><i class="fas fa-plus-circle"></i> 添加题目</a></li>
+                    <li><a href="#"><i class="fas fa-list"></i> 管理题目</a></li>
+                    <li><a href="#"><i class="fas fa-users"></i> 用户管理</a></li>
+                    <li><a href="#"><i class="fas fa-chart-bar"></i> 统计</a></li>
+                    <li><a href="#"><i class="fas fa-cogs"></i> 系统设置</a></li>
+                </ul>
+            </div>
+            
+            <div class="admin-content">
+                <h2><i class="fas fa-home"></i> 仪表板</h2>
+                <p>欢迎进入 ProgramJudge 管理后台！</p>
+                
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #4CAF50;">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>2</h3>
+                            <p>题目数量</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #2196F3;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>0</h3>
+                            <p>通过次数</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #FF9800;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>1</h3>
+                            <p>注册用户</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <h3><i class="fas fa-bolt"></i> 快速操作</h3>
+                    <div class="action-buttons">
+                        <a href="edit-problem.html" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> 添加新题目
+                        </a>
+                        <a href="../problems.html" class="btn btn-secondary">
+                            <i class="fas fa-eye"></i> 查看题目列表
+                        </a>
+                        <a href="../submit.html" class="btn btn-secondary">
+                            <i class="fas fa-play"></i> 测试评测
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="recent-activity">
+                    <h3><i class="fas fa-history"></i> 最近活动</h3>
+                    <p>暂无活动记录</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 ProgramJudge | 后台管理系统 | 管理员: Steven1356China</p>
+        </div>
+    </footer>
+
+    <script>
+        // 添加后台样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .dashboard-stats {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+                margin: 2rem 0;
+            }
+            .stat-card {
+                background: white;
+                border-radius: 8px;
+                padding: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.5rem;
+            }
+            .stat-info h3 {
+                font-size: 1.8rem;
+                color: #2d3748;
+                margin: 0;
+            }
+            .stat-info p {
+                color: #718096;
+                margin: 0;
+            }
+            .quick-actions {
+                background: white;
+                padding: 1.5rem;
+                border-radius: 8px;
+                margin: 2rem 0;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            .action-buttons {
+                display: flex;
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+            .recent-activity {
+                background: white;
+                padding: 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
