@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题目列表 - ProgramJudge</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-code"></i>
+                <span>ProgramJudge</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> 首页</a>
+                <a href="problems.html" class="active"><i class="fas fa-list"></i> 题目</a>
+                <a href="submit.html"><i class="fas fa-play"></i> 评测</a>
+                <a href="admin/index.html"><i class="fas fa-cog"></i> 后台</a>
+                <span class="user-info">
+                    <i class="fas fa-user"></i> Steven1356China
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="problem-header">
+            <h1><i class="fas fa-list"></i> 题目列表</h1>
+            <p>选择题目开始编程挑战</p>
+        </div>
+
+        <div class="problems-grid" id="problems-list">
+            <!-- 题目列表由JavaScript动态加载 -->
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 ProgramJudge | 开发者: Steven1356China</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        // 加载题目列表
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('assets/data/problems.json');
+                const problems = await response.json();
+                const container = document.getElementById('problems-list');
+                
+                problems.forEach(problem => {
+                    const problemCard = document.createElement('div');
+                    problemCard.className = 'problem-card';
+                    problemCard.innerHTML = `
+                        <div class="problem-info">
+                            <h3>${problem.id}. ${problem.title}</h3>
+                            <div class="problem-meta">
+                                <span><i class="fas fa-clock"></i> 时间限制: ${problem.timeLimit}ms</span>
+                                <span><i class="fas fa-memory"></i> 内存限制: ${problem.memoryLimit}MB</span>
+                                <span class="difficulty ${problem.difficulty}">${problem.difficulty}</span>
+                            </div>
+                        </div>
+                        <a href="problem.html?id=${problem.id}" class="btn btn-primary">
+                            <i class="fas fa-eye"></i> 查看题目
+                        </a>
+                    `;
+                    container.appendChild(problemCard);
+                });
+            } catch (error) {
+                console.error('加载题目失败:', error);
+                document.getElementById('problems-list').innerHTML = 
+                    '<p class="error">加载题目失败，请检查网络连接</p>';
+            }
+        });
+    </script>
+</body>
+</html>
