@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义评测 - ProgramJudge</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-code"></i>
+                <span>ProgramJudge</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html"><i class="fas fa-home"></i> 首页</a>
+                <a href="problems.html"><i class="fas fa-list"></i> 题目</a>
+                <a href="submit.html" class="active"><i class="fas fa-play"></i> 评测</a>
+                <a href="admin/index.html"><i class="fas fa-cog"></i> 后台</a>
+                <span class="user-info">
+                    <i class="fas fa-user"></i> Steven1356China
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1><i class="fas fa-play-circle"></i> 自定义代码评测</h1>
+        <p>在此页面输入代码和测试数据，即时评测</p>
+        
+        <div class="editor-container">
+            <div class="code-editor">
+                <div class="editor-header">
+                    <span>代码编辑器</span>
+                    <div class="editor-controls">
+                        <select id="language-select" class="language-select">
+                            <option value="54">C++ (GCC 9.2.0)</option>
+                            <option value="71">Python (3.8.1)</option>
+                        </select>
+                        <button id="run-btn" class="btn btn-primary">
+                            <i class="fas fa-play"></i> 运行代码
+                        </button>
+                    </div>
+                </div>
+                <textarea id="editor" placeholder="输入你的代码..."></textarea>
+            </div>
+            
+            <div class="io-panel">
+                <div class="input-panel">
+                    <h3><i class="fas fa-keyboard"></i> 输入数据</h3>
+                    <textarea id="input-data" placeholder="输入测试数据...">1 2</textarea>
+                </div>
+                <div class="output-panel">
+                    <h3><i class="fas fa-terminal"></i> 输出结果</h3>
+                    <pre id="output-data">运行结果将显示在这里...</pre>
+                </div>
+            </div>
+        </div>
+        
+        <div id="execution-info" class="result-container" style="display: none;">
+            <h3><i class="fas fa-info-circle"></i> 执行信息</h3>
+            <div id="execution-details"></div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 ProgramJudge | 开发者: Steven1356China</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    
+    <script src="assets/js/judge-api.js"></script>
+    <script>
+        let editor;
+        
+        // 初始化编辑器
+        function initEditor() {
+            editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+                lineNumbers: true,
+                mode: "text/x-c++src",
+                theme: "dracula",
+                indentUnit: 4,
+                matchBrackets: true,
+                autoCloseBrackets: true,
+                extraKeys: {"Ctrl-Space": "autocomplete"},
+                value: `#include <iostream>\nusing namespace std;\n\nint main() {\n    int a, b;\n    cin >> a >> b;\n    cout << a + b << endl;\n    return 0;\n}`
+            });
+            
+            // 监听语言切换
+            document.getElementById('language-select').addEventListener('change', function() {
+                const mode = this.value === '54' ? 'text/x-c++src' : 'python';
+                editor.setOption('mode', mode);
+                
+                // 更新示例代码
+                if (this.value === '71') { // Python
+                    editor.setValue(`a, b = map(int, input().split())\nprint(a + b)`);
+                } else { // C++
+                    editor.setValue(`#include <iostream>\nusing namespace std;\n\nint main() {\n    int a, b;\n    cin >> a >> b;\n    cout << a + b << endl;\n    return 0;\n}`);
+                }
+            });
+        }
+        
+        // 运行代码
+        document.getElementById('run-btn').addEventListener('click', async function() {
+            const code = editor.getValue();
+            const inputData = document.getElementById('input-data').value;
+            const languageId = document.getElementById('language-select').value;
+            
+            if (!code.trim()) {
+                alert('请输入代码');
+                return;
+            }
+            
+            const runBtn = this;
+            const originalText = runBtn.innerHTML;
+            runBtn.disabled = true;
+            runBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 运行中...';
+            
+            try {
+                const result = await runCode(code, languageId, inputData);
+                displayResult(result);
+            } catch (error) {
+                document.getElementById('output-data').textContent = `错误: ${error.message}`;
+                document.getElementById('execution-info').style.display = 'none';
+            } finally {
+                runBtn.disabled = false;
+                runBtn.innerHTML = originalText;
+            }
+        });
+        
+        // 显示结果
+        function displayResult(result) {
+            const outputEl = document.getElementById('output-data');
+            const infoEl = document.getElementById('execution-info');
+            const detailsEl = document.getElementById('execution-details');
+            
+            if (result.stdout) {
+                outputEl.textContent = result.stdout;
+                outputEl.style.color = '#2ecc71';
+            } else if (result.stderr) {
+                outputEl.textContent = result.stderr;
+                outputEl.style.color = '#e74c3c';
+            } else if (result.compile_output) {
+                outputEl.textContent = result.compile_output;
+                outputEl.style.color = '#e67e22';
+            } else {
+                outputEl.textContent = '无输出';
+                outputEl.style.color = '#95a5a6';
+            }
+            
+            // 显示执行信息
+            infoEl.style.display = 'block';
+            detailsEl.innerHTML = `
+                <p>状态: <span class="${result.status === 'Accepted' ? 'accepted' : 'wrong'}">${result.status || '执行完成'}</span></p>
+                <p>时间: ${result.time || 0} 毫秒</p>
+                <p>内存: ${result.memory || 0} KB</p>
+                ${result.exit_code !== 0 ? `<p>退出代码: ${result.exit_code}</p>` : ''}
+            `;
+        }
+        
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', function() {
+            initEditor();
+            
+            // 添加样式
+            const style = document.createElement('style');
+            style.textContent = `
+                .io-panel {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 1rem;
+                    margin: 1rem 0;
+                }
+                .input-panel, .output-panel {
+                    background: white;
+                    border-radius: 6px;
+                    padding: 1rem;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                }
+                .input-panel h3, .output-panel h3 {
+                    margin-bottom: 0.5rem;
+                    color: #2d3748;
+                }
+                #input-data, #output-data {
+                    width: 100%;
+                    height: 200px;
+                    padding: 0.8rem;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 4px;
+                    font-family: 'Consolas', monospace;
+                    font-size: 14px;
+                    background: #f7fafc;
+                    resize: vertical;
+                }
+                #output-data {
+                    white-space: pre-wrap;
+                    word-break: break-all;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
